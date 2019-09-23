@@ -36,12 +36,6 @@ class ConvBuilder(nn.Module):
             track_running_stats = self.BN_track_running_stats
         return nn.BatchNorm2d(num_features=num_features, eps=eps, momentum=momentum, affine=affine, track_running_stats=track_running_stats)
 
-    # def _SubsequentBN2d(self, num_features, eps=None, momentum=None, affine=None, track_running_stats=None):
-    #     return self._BatchNorm2d(num_features=num_features, eps=eps, momentum=momentum, affine=affine, track_running_stats=track_running_stats)
-    #
-    # def SeparateBN2d(self, num_features, eps=None, momentum=None, affine=None, track_running_stats=None):
-    #     return self._BatchNorm2d(num_features=num_features, eps=eps, momentum=momentum, affine=affine, track_running_stats=track_running_stats)
-
 
     def Sequential(self, *args):
         return nn.Sequential(*args)

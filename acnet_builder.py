@@ -8,7 +8,6 @@ class ACBlock(nn.Module):
     #   May not work on other models
     #   In general cases, I know how to do the math for the asymmetric layers to #match# the target feature map
     #   size produced by the square conv layer, which requires me to know the size of outputs of square conv layer #in advance#.
-    #   It is trivial to get the shape of the outputs in Tensorflow, but I do not know how to do this using PyTorch.
     #   Maybe I will come up with a general solution in the future (when I get familiar with PyTorch).
     #   Of course, case-by-case solutions are obvious.
     #   by Ding Xiaohan 2019/08/30
@@ -28,7 +27,6 @@ class ACBlock(nn.Module):
                                       padding=(0, min(1, padding)), dilation=dilation, groups=groups, bias=False,
                                       padding_mode=padding_mode)
         self.horizontal_BN = nn.BatchNorm2d(num_features=out_channels)
-        self.cancel_next_subsequent_BN = False
 
 
     def forward(self, input):

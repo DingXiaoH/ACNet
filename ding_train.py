@@ -14,11 +14,6 @@ import time
 from builder import ConvBuilder
 from utils.lr_scheduler import WarmupMultiStepLR
 
-# try:
-#     from apex.parallel.distributed import DistributedDataParallel
-#     from apex import amp
-# except ImportError:
-#     raise ImportError('Use APEX for multi-precision via apex.amp')
 
 def train_one_step(net, data, label, optimizer, criterion, if_accum_grad = False):
     pred = net(data)
@@ -113,20 +108,6 @@ def get_lr_scheduler(cfg, optimizer):
 
 
 def ding_train(cfg:BaseConfigByEpoch, net=None, train_dataloader=None, val_dataloader=None, show_variables=False, convbuilder=None):
-
-    # LOCAL_RANK = 0
-    #
-    # num_gpus = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
-    # is_distributed = num_gpus > 1
-    #
-    # if is_distributed:
-    #     torch.cuda.set_device(LOCAL_RANK)
-    #     torch.distributed.init_process_group(
-    #         backend="nccl", init_method="env://"
-    #     )
-    #     synchronize()
-    #
-    # torch.backends.cudnn.benchmark = True
 
     ensure_dir(cfg.output_dir)
     ensure_dir(cfg.tb_dir)
@@ -261,18 +242,3 @@ def ding_train(cfg:BaseConfigByEpoch, net=None, train_dataloader=None, val_datal
         #   do something after the training
         engine.save_checkpoint(cfg.save_weights)
         print('NOTE: training finished, saved to {}'.format(cfg.save_weights))
-
-
-
-
-
-            # if engine.world_rank == 0:
-            #     if iteration % 20 == 0 or iteration == max_iter:
-            #         # loss_dict = reducke_loss_dict(loss_dict)
-            #         log_str = 'it:%d, lr:%.1e, ' % (
-            #             iteration, optimizer.param_groups[0]["lr"])
-            #         for key in loss_dict:
-            #             tb_writer.add_scalar(
-            #                 key, loss_dict[key].mean(), global_step=iteration)
-            #             log_str += key + ': %.3f, ' % float(loss_dict[key])
-            #         logger.info(log_str)
