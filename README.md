@@ -1,9 +1,12 @@
 # ACNet
 
+News:
+1. ACNet has been used in real business products.
+2. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
 
 This repository contains the codes for the following ICCV-2019 paper 
 
-[ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](https://arxiv.org/abs/1908.03930).
+[ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf).
 
 The codes are based on PyTorch 1.1.
 
@@ -11,12 +14,13 @@ The experiments reported in the paper were performed using Tensorflow. However, 
 
 Citation:
 
-	@article{ding2019acnet,
-        title={ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks},
-        author={Ding, Xiaohan and Guo, Yuchen and Ding, Guiguang and Han, Jungong},
-        journal={arXiv preprint arXiv:1908.03930},
-        year={2019}
-    }
+	@InProceedings{Ding_2019_ICCV,
+	author = {Ding, Xiaohan and Guo, Yuchen and Ding, Guiguang and Han, Jungong},
+	title = {ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks},
+	booktitle = {The IEEE International Conference on Computer Vision (ICCV)},
+	month = {October},
+	year = {2019}
+	}
 
 ## Introduction
 
