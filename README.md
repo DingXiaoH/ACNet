@@ -1,4 +1,5 @@
 # ACNet
+Note: there are some bugs. I am checking. (2019/11/05)
 
 News:
 1. ACNet has been used in real business products.
