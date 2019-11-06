@@ -1,5 +1,6 @@
 # ACNet
 Note: there are some bugs. I am checking. (2019/11/05)
+The padding mechanism of PyTorch is different from Tensorflow. This can result in some difference, because using asymmetric convolutions requires handling the padding arguments properly in order to produce the same size of outputs. I am working to find a general solution. (2019/11/06)
 
 News:
 1. ACNet has been used in real business products.
