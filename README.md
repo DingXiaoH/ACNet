@@ -2,6 +2,8 @@
 Note: there are some bugs. I am checking. (2019/11/05)
 The padding mechanism of PyTorch is different from Tensorflow. This can result in some difference, because using asymmetric convolutions requires handling the padding arguments properly in order to produce the same size of outputs. I am working to find a general solution. (2019/11/06)
 
+Just found another difference. I used tf.contrib.layers.xavier_initializer in my Tensorflow codes. But the default initialization of conv layer in PyTorch is kaiming_uniform_(self.weight, a=math.sqrt(5)). Finished the codes for training-deployment transformation (BN fusion and branch fusion). I am testing. (2019/11/08)
+
 News:
 1. ACNet has been used in real business products.
 2. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
