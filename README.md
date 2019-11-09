@@ -18,7 +18,7 @@ Some results reproduced on CIFAR-10 using the codes in this repository (note tha
 
 | Model        | Baseline           | ACNet  |
 | ------------- |:-------------:| -----:|
-| Cifar-quick   | 85.457 	|  	86.758 |
+| Cifar-quick   | 86.249 	|  	87.102 |
 | VGG      	| 94.250      	|   	94.862 |
 | ResNet-56 	| 94.573      	|    	94.864 |
 | WRN-16-8 	| 95.582	|    	95.920 |

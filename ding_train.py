@@ -344,19 +344,3 @@ def ding_train(cfg:BaseConfigByEpoch, net=None, train_dataloader=None, val_datal
             engine.save_checkpoint(cfg.save_weights)
             print('NOTE: training finished, saved to {}'.format(cfg.save_weights))
         engine.save_hdf5(os.path.join(cfg.output_dir, 'finish.hdf5'))
-
-
-
-
-
-
-            # if engine.world_rank == 0:
-            #     if iteration % 20 == 0 or iteration == max_iter:
-            #         # loss_dict = reducke_loss_dict(loss_dict)
-            #         log_str = 'it:%d, lr:%.1e, ' % (
-            #             iteration, optimizer.param_groups[0]["lr"])
-            #         for key in loss_dict:
-            #             tb_writer.add_scalar(
-            #                 key, loss_dict[key].mean(), global_step=iteration)
-            #             log_str += key + ': %.3f, ' % float(loss_dict[key])
-            #         logger.info(log_str)

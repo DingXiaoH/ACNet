@@ -113,10 +113,16 @@ class Engine(object):
     def load_hdf5(self, path):
         hdf5_dict = read_hdf5(path)
         assigned_params = 0
-        params = self.state.model.named_parameters()
-        for k, v in params:
+        for k, v in self.state.model.named_parameters():
             if k in hdf5_dict:
                 self.set_value(v, hdf5_dict[k])
+            else:
+                print('param {} not found in hdf5')
+        for k, v in self.state.model.named_buffers():
+            if k in hdf5_dict:
+                self.set_value(v, hdf5_dict[k])
+            else:
+                print('buffer {} not found in hdf5')
             assigned_params += 1
         print('Assigned {} params from hdf5: {}'.format(assigned_params, path))
 
