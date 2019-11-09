@@ -15,6 +15,7 @@ This demo will show you how to
 4. Convert the ACNet into exactly the same structure as the regular counterpart for deployment. Congratulations! The users of your model would be happy because they can enjoy higher accuracy with exactly the same computational burdens as the baseline trained with regular conv layers.
 
 Some results reproduced on CIFAR-10 using the codes in this repository (note that we add batch norm for Cifar-quick and VGG baselines):
+
 | Model        | Baseline           | ACNet  |
 | ------------- |:-------------:| -----:|
 | Cifar-quick   | 85.457 	|  	86.758 |
@@ -81,7 +82,7 @@ python acnet/acnet_rc56.py --try_arg=acnet_lrs3_warmup_bias
 ```
 WRN-16-8, we slightly lengthen the learning rate schedule recommended in the WRN paper:
 ```
-python acnet/acnet_rc56.py --try_arg=acnet_lrs6_warmup_bias
+python acnet/acnet_wrnc16.py --try_arg=acnet_lrs6_warmup_bias
 ```
 
 ## TODOs. 
