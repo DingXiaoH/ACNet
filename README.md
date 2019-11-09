@@ -42,16 +42,20 @@ Citation:
 As designing appropriate Convolutional Neural Network (CNN) architecture in the context of a given application usually involves heavy human works or numerous GPU hours, the research community is soliciting the architecture-neutral CNN structures, which can be easily plugged into multiple mature architectures to improve the performance on our real-world applications. We propose Asymmetric Convolution Block (ACB), an architecture-neutral structure as a CNN building block, which uses 1D asymmetric convolutions to strengthen the square convolution kernels. For an off-the-shelf architecture, we replace the standard square-kernel convolutional layers with ACBs to construct an Asymmetric Convolutional Network (ACNet), which can be trained to reach a higher level of accuracy. After training, we equivalently convert the ACNet into the same original architecture, thus requiring no extra computations anymore. We have observed that ACNet can improve the performance of various models on CIFAR and ImageNet by a clear margin. Through further experiments, we attribute the effectiveness of ACB to its capability of enhancing the model's robustness to rotational distortions and strengthening the central skeleton parts of square convolution kernels.
 
 ## Example Usage
-  
-This repo holds the example codes for training ResNet-56 and WRN-16-8 on CIFAR-10.
 
-1. Install PyTorch 1.1. Modify the 'CIFAR10_PATH' in dataset.py to the directory of your CIFAR-10 dataset. If the dataset is not found in that directory, it would be automatically downloaded. 
+1. Install PyTorch 1.1. Clone this repo and enter the directory. Modify PYTHONPATH or you will get an ImportError.
+```
+export PYTHONPATH='WHERE_YOU_CLONED_THIS_REPO'
+```
 
-2. Train a Cifar-quick on CIFAR-10 without Asymmetric Convolution Blocks as baseline. Modify PYTHONPATH if you get a module importing error. (We use learning rate warmup and weight decay on bias parameters. They are not necessities but just preferences.) The model will be evaluated every two epochs. Here 'lrs5' is a pre-defined learning rate schedule.
+2. Modify 'CIFAR10_PATH' in dataset.py to the directory of your CIFAR-10 dataset. If the dataset is not found in that directory, it will be automatically downloaded. 
+
+3. Train a Cifar-quick on CIFAR-10 without Asymmetric Convolution Blocks as baseline. (We use learning rate warmup and weight decay on bias parameters. They are not necessities but just preferences. Here 'lrs5' is a pre-defined learning rate schedule.) The model will be evaluated every two epochs.
 ```
 python acnet/acnet_cfqkbnc.py --try_arg=normal_lrs5_warmup_bias
 ```
-3. Train a Cifar-quick on CIFAR-10 with Asymmetric Convolution Blocks. The trained weights will be saved to acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish.hdf5. Note that Cifar-quick uses 5x5 convs, and we add 1x3 and 3x1 onto 5x5 kernels. Of course, 1x5 and 5x1 convs may work better.
+
+4. Train a Cifar-quick on CIFAR-10 with Asymmetric Convolution Blocks. The trained weights will be saved to acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish.hdf5. Note that Cifar-quick uses 5x5 convs, and we add 1x3 and 3x1 onto 5x5 kernels. Of course, 1x5 and 5x1 convs may work better.
 ```
 python acnet/acnet_cfqkbnc.py --try_arg=acnet_lrs5_warmup_bias
 ```
@@ -72,6 +76,7 @@ python display_hdf5.py acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish_de
 ```
 
 Other models:
+
 VGG is deeper, so we train it for longer:
 ```
 python acnet/acnet_vgg.py --try_arg=acnet_lrs3_warmup_bias
@@ -88,9 +93,31 @@ python acnet/acnet_wrnc16.py --try_arg=acnet_lrs6_warmup_bias
 ## TODOs. 
 1. Design experiments to show that an ACB is not equivalent to a regular conv layer by showing the difference between the outputs from a normal conv layer and an ACB with the same inputs.
 2. Support more networks.
+3. Release a python module so that you can use Asymmetric Convolution Block just like the following example. Pull requests are welcomed.
+```
+from acb import AsymConvBlock, acnet_fuse_and_load, acnet_switch_to_deploy
+
+# build model, replace regular Conv2d with AsymConvBlock
+class YourNet(nn.module):
+    ...
+    self.conv1 = AsymConvBlock(in_channels=..., out_channels=..., ...)
+    self.conv2 = AsymConvBlock(in_channels=..., out_channels=..., ...)
+
+# train
+model = YourNet(...)
+train(model)
+model.save_checkpoint(SAVE_PATH)	# use just the same PyTorch APIs
+
+# deploy
+acnet_switch_to_deploy()
+deploy_model = YourNet(...)		# here deploy_model should be of the same structure as baseline
+acnet_fuse_and_load(SAVE_PATH)		# use the converted weights to initliaze it
+test(model)
+```
 
 
 ## Contact
 dxh17@mails.tsinghua.edu.cn
 
 Google Scholar Profile: https://scholar.google.com/citations?user=CIjw0KoAAAAJ&hl=en
+
