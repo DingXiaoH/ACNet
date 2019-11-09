@@ -12,9 +12,9 @@ This demo will show you how to
 1. Build an ACNet with Asymmetric Convolution Block. Just a few lines of code!
 2. Train the ACNet together with the regular CNN baseline with the same training configurations.
 3. Test the ACNet and the baseline, get the average accuracy.
-4. Convert the ACNet into exactly the same structure as the regular counterpart for deployment. Congratulations! The users of your model would be happy because they can enjoy higher accuracy with exactly the same computational burdens as the baseline trained with regular conv layers.
+4. Convert the ACNet into exactly the same structure as the regular counterpart for deployment. Congratulations! The users of your model will be happy because they can enjoy higher accuracy with exactly the same computational burdens as the baseline trained with regular conv layers.
 
-Some results reproduced on CIFAR-10 using the codes in this repository (note that we add batch norm for Cifar-quick and VGG baselines):
+Some results (Top-1 accuracy) reproduced on CIFAR-10 using the codes in this repository (note that we add batch norm for Cifar-quick and VGG baselines):
 
 | Model        | Baseline           | ACNet  |
 | ------------- |:-------------:| -----:|
@@ -60,7 +60,7 @@ python acnet/acnet_cfqkbnc.py --try_arg=normal_lrs5_warmup_bias
 python acnet/acnet_cfqkbnc.py --try_arg=acnet_lrs5_warmup_bias
 ```
 
-4. Check the average accuracy of the two models in their last ten evaluations. You can see the gap.
+4. Check the average accuracy of the two models in their last ten evaluations. You will see the gap.
 ```
 python show_log.py
 ```
