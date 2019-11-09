@@ -1,8 +1,4 @@
 # ACNet
-Note: there are some bugs. I am checking. (2019/11/05)
-The padding mechanism of PyTorch is different from Tensorflow. This can result in some difference, because using asymmetric convolutions requires handling the padding arguments properly in order to produce the same size of outputs. I am working to find a general solution. (2019/11/06)
-
-Just found another difference. I used tf.contrib.layers.xavier_initializer in my Tensorflow codes. But the default initialization of conv layer in PyTorch is kaiming_uniform_(self.weight, a=math.sqrt(5)). Finished the codes for training-deployment transformation (BN fusion and branch fusion). I am testing. (2019/11/08)
 
 News:
 1. ACNet has been used in real business products.
@@ -11,6 +7,20 @@ News:
 This repository contains the codes for the following ICCV-2019 paper 
 
 [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf).
+
+This demo will show you how to
+1. Build an ACNet with Asymmetric Convolution Block. Just a few lines of code!
+2. Train the ACNet together with the regular CNN baseline with the same training configurations.
+3. Test the ACNet and the baseline, get the average accuracy.
+4. Convert the ACNet into exactly the same structure as the regular counterpart for deployment. Congratulations! The users of your model would be happy because they can enjoy higher accuracy with exactly the same computational burdens as the baseline trained with regular conv layers.
+
+Some results reproduced on CIFAR-10 using the codes in this repository (note that we add batch norm for Cifar-quick and VGG baselines):
+| Model        | Baseline           | ACNet  |
+| ------------- |:-------------:| -----:|
+| Cifar-quick   | 85.457 	|  	86.758 |
+| VGG      	| 94.250      	|   	94.862 |
+| ResNet-56 	| 94.573      	|    	94.864 |
+| WRN-16-8 	| 95.582	|    	95.920 |
 
 The codes are based on PyTorch 1.1.
 
@@ -34,27 +44,45 @@ As designing appropriate Convolutional Neural Network (CNN) architecture in the 
   
 This repo holds the example codes for training ResNet-56 and WRN-16-8 on CIFAR-10.
 
-1. Install PyTorch 1.1
+1. Install PyTorch 1.1. Modify the 'CIFAR10_PATH' in dataset.py to the directory of your CIFAR-10 dataset. If the dataset is not found in that directory, it would be automatically downloaded. 
 
-2. Train a ResNet-56 on CIFAR-10 without Asymmetric Convolution Blocks as baseline
+2. Train a Cifar-quick on CIFAR-10 without Asymmetric Convolution Blocks as baseline. Modify PYTHONPATH if you get a module importing error. (We use learning rate warmup and weight decay on bias parameters. They are not necessities but just preferences.) The model will be evaluated every two epochs. Here 'lrs5' is a pre-defined learning rate schedule.
 ```
-python acnet_rc56.py --try_arg=normal_lrs1
+python acnet/acnet_cfqkbnc.py --try_arg=normal_lrs5_warmup_bias
 ```
-3. Train a ResNet-56 on CIFAR-10 with Asymmetric Convolution Blocks
+3. Train a Cifar-quick on CIFAR-10 with Asymmetric Convolution Blocks. The trained weights will be saved to acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish.hdf5. Note that Cifar-quick uses 5x5 convs, and we add 1x3 and 3x1 onto 5x5 kernels. Of course, 1x5 and 5x1 convs may work better.
 ```
-python acnet_rc56.py --try_arg=acnet_lrs1
-```
-4. Build a ResNet-56 with the same structure as the baseline model, then convert the weights of the ACNet counterpart to initialize it.
-
-TODO: I will implement these codes when I get my GPUs busy on experiments for my next paper and start to play with PyTorch. Pull requests are welcomed.
-
-
-On WideResNet (WRN-16-8):
-```
-python acnet_wrnc16.py --try_arg=normal_lrs2
-python acnet_wrnc16.py --try_arg=acnet_lrs2
+python acnet/acnet_cfqkbnc.py --try_arg=acnet_lrs5_warmup_bias
 ```
 
+4. Check the average accuracy of the two models in their last ten evaluations. You can see the gap.
+```
+python show_log.py
+```
+
+5. Build a Cifar-quick with the same structure as the baseline model, then convert the weights of the ACNet counterpart via BN fusion and branch fusion to initialize it. Test before and after the conversion. You will see identical results.
+```
+python acnet/acnet_test.py cfqkbnc acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish.hdf5
+```
+
+6. Check the name and shape of the converted weights.
+```
+python display_hdf5.py acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish_deploy.hdf5
+```
+
+Other models:
+VGG is deeper, so we train it for longer:
+```
+python acnet/acnet_vgg.py --try_arg=acnet_lrs3_warmup_bias
+```
+ResNet-56:
+```
+python acnet/acnet_rc56.py --try_arg=acnet_lrs3_warmup_bias
+```
+WRN-16-8, we slightly lengthen the learning rate schedule recommended in the WRN paper:
+```
+python acnet/acnet_rc56.py --try_arg=acnet_lrs6_warmup_bias
+```
 
 ## TODOs. 
 1. Design experiments to show that an ACB is not equivalent to a regular conv layer by showing the difference between the outputs from a normal conv layer and an ACB with the same inputs.
