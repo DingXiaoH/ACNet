@@ -4,6 +4,47 @@ from typing import Tuple, List, Dict
 import torch
 import sys
 import json
+import h5py
+import numpy as np
+import time
+
+def cur_time():
+    return time.strftime('%Y,%b,%d,%X')
+
+def log_important(message, log_file):
+    print(message, cur_time())
+    with open(log_file, 'a') as f:
+        print(message, cur_time(), file=f)
+
+
+
+def representsInt(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+def read_hdf5(file_path):
+    result = {}
+    with h5py.File(file_path, 'r') as f:
+        for k in f.keys():
+            value = np.asarray(f[k])
+            if representsInt(k):
+                result[int(k)] = value
+            else:
+                result[str(k).replace('+','/')] = value
+    print('read {} arrays from {}'.format(len(result), file_path))
+    f.close()
+    return result
+
+def save_hdf5(numpy_dict, file_path):
+    with h5py.File(file_path, 'w') as f:
+        for k,v in numpy_dict.items():
+            f.create_dataset(str(k).replace('/','+'), data=v)
+    print('saved {} arrays to {}'.format(len(numpy_dict), file_path))
+    f.close()
+
 
 def start_exp():
     import argparse
@@ -89,17 +130,17 @@ def mkdir(path):
         print('creating dir {}'.format(path))
         os.mkdir(path)
 
-def save_checkpoint(cur_iters, net, optimizer, lr_scheduler, file_name):
-    checkpoint = {'cur_iters': cur_iters,
-                  'state_dict': net.state_dict(),
-                  'optimizer_state_dict': optimizer.state_dict(),
-                  'lr_scheduler_state_dict':lr_scheduler.state_dict()}
-    if os.path.exists(file_name):
-        print('Overwriting {}'.format(file_name))
-    torch.save(checkpoint, file_name)
-    link_name = os.path.join('/', *file_name.split(os.path.sep)[:-1], 'last.checkpoint')
-    #print(link_name)
-    make_symlink(source = file_name, link_name=link_name)
+# def save_checkpoint(cur_iters, net, optimizer, lr_scheduler, file_name):
+#     checkpoint = {'cur_iters': cur_iters,
+#                   'state_dict': net.state_dict(),
+#                   'optimizer_state_dict': optimizer.state_dict(),
+#                   'lr_scheduler_state_dict':lr_scheduler.state_dict()}
+#     if os.path.exists(file_name):
+#         print('Overwriting {}'.format(file_name))
+#     torch.save(checkpoint, file_name)
+#     link_name = os.path.join('/', *file_name.split(os.path.sep)[:-1], 'last.checkpoint')
+#     #print(link_name)
+#     make_symlink(source = file_name, link_name=link_name)
 
 def load_checkpoint(file_name, net = None, optimizer = None, lr_scheduler = None):
     if os.path.isfile(file_name):

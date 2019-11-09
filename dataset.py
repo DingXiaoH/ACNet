@@ -27,10 +27,13 @@ class InfiniteDataLoader(torch.utils.data.DataLoader):
 
 
 def create_dataset(dataset_name, subset, batch_size):
-    assert dataset_name in ['cifar10', 'ch', 'svhn', 'mnist']
+    assert dataset_name in ['imagenet', 'cifar10', 'ch', 'svhn', 'mnist']
     assert subset in ['train', 'val']
+    if dataset_name == 'imagenet':
+        raise ValueError('TODO')
+
     #   copied from https://github.com/pytorch/examples/blob/master/mnist/main.py
-    if dataset_name == 'mnist':
+    elif dataset_name == 'mnist':
         if subset == 'train':
             return InfiniteDataLoader(datasets.MNIST(MNIST_PATH, train=True, download=True,
                                transform=transforms.Compose([

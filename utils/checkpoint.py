@@ -3,7 +3,7 @@ import time
 from collections import OrderedDict
 
 
-def load_model(model, model_file, logger, is_restore=False):
+def load_model(model, model_file, logger):
     t_start = time.time()
     if isinstance(model_file, str):
         state_dict = torch.load(model_file, map_location='cpu')
@@ -16,13 +16,12 @@ def load_model(model, model_file, logger, is_restore=False):
         model.state_dict(), state_dict)
     t_io_end = time.time()
 
-    if is_restore:
-        new_state_dict = OrderedDict()
-        for k, v in state_dict.items():
-            name = 'module.' + k
-            new_state_dict[name] = v
-        state_dict = new_state_dict
-
+    # if is_restore:
+    #     new_state_dict = OrderedDict()
+    #     for k, v in state_dict.items():
+    #         name = 'module.' + k
+    #         new_state_dict[name] = v
+    #     state_dict = new_state_dict
     model.load_state_dict(state_dict, strict=False)
     ckpt_keys = set(state_dict.keys())
     own_keys = set(model.state_dict().keys())

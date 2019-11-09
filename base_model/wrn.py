@@ -11,7 +11,7 @@ class WRNCifarBlock(nn.Module):
         if projection_shortcut:
             self.proj = builder.BNReLUConv2d(in_channels=input_channels, out_channels=block_channels[1], kernel_size=1, stride=stride, padding=0)
         else:
-            self.proj = builder.Identity()
+            self.proj = builder.ResIdentity(num_channels=block_channels[1])
 
         self.conv1 = builder.BNReLUConv2d(in_channels=input_channels, out_channels=block_channels[0], kernel_size=3,
                                           stride=stride, padding=1)
@@ -75,6 +75,7 @@ class WRNCifarNet(nn.Module):
         out = self.bd.flatten(out)
         out = self.linear(out)
         return out
+
 
 
 def create_wrnc16plain(cfg, builder):

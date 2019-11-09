@@ -22,6 +22,9 @@ def get_logger(name='', save_dir=None, distributed_rank=0, filename="log.txt"):
         fh = logging.FileHandler(os.path.join(save_dir, filename))
         fh.setLevel(logging.DEBUG)
         fh.setFormatter(formatter)
+        if len(logger.handlers) > 0:
+            logger.removeHandler(logger.handlers[0])
         logger.addHandler(fh)
 
     return logger
+
