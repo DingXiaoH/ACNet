@@ -93,7 +93,7 @@ python acnet/acnet_wrnc16.py --try_arg=acnet_lrs6_warmup_bias
 ## TODOs. 
 1. Design experiments to show that an ACB is not equivalent to a regular conv layer by showing the difference between the outputs from a normal conv layer and an ACB with the same inputs.
 2. Support more networks.
-3. Release a python module so that you can use Asymmetric Convolution Block just like the following example. Pull requests are welcomed.
+3. Release a PyTorch module so that you can use Asymmetric Convolution Block just like the following example. Pull requests are welcomed.
 ```
 from acnet import AsymConvBlock, acnet_fuse_and_load, acnet_switch_to_deploy
 
@@ -106,7 +106,7 @@ class YourNet(nn.module):
 # train
 model = YourNet(...)
 train(model)
-model.save_checkpoint(SAVE_PATH)	# use just the same PyTorch APIs
+model.save_checkpoint(SAVE_PATH)	# use just the same PyTorch functions
 
 # deploy
 acnet_switch_to_deploy()
