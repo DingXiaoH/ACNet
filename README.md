@@ -91,9 +91,8 @@ python acnet/acnet_wrnc16.py --try_arg=acnet_lrs6_warmup_bias
 ```
 
 ## TODOs. 
-1. Design experiments to show that an ACB is not equivalent to a regular conv layer by showing the difference between the outputs from a normal conv layer and an ACB with the same inputs.
-2. Support more networks.
-3. Release a PyTorch module so that you can use Asymmetric Convolution Block just like the following example. Pull requests are welcomed.
+1. Support more networks.
+2. Release a PyTorch module so that you can use Asymmetric Convolution Block just like the following example. Pull requests are welcomed.
 ```
 from acnet import AsymConvBlock, acnet_fuse_and_load, acnet_switch_to_deploy
 
@@ -121,3 +120,12 @@ dxh17@mails.tsinghua.edu.cn
 
 Google Scholar Profile: https://scholar.google.com/citations?user=CIjw0KoAAAAJ&hl=en
 
+My open-sourced papers and repos:
+
+CNN component (ICCV 2019): [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf) (https://github.com/DingXiaoH/ACNet)
+
+Channel pruning (CVPR 2019): [Centripetal SGD for Pruning Very Deep Convolutional Networks with Complicated Structure](http://openaccess.thecvf.com/content_CVPR_2019/html/Ding_Centripetal_SGD_for_Pruning_Very_Deep_Convolutional_Networks_With_Complicated_CVPR_2019_paper.html) (https://github.com/DingXiaoH/Centripetal-SGD)
+
+Channel pruning (ICML 2019): [Approximated Oracle Filter Pruning for Destructive CNN Width Optimization](http://proceedings.mlr.press/v97/ding19a.html) (https://github.com/DingXiaoH/AOFP)
+
+Unstructured pruning (NeurIPS 2019): [Global Sparse Momentum SGD for Pruning Very Deep Neural Networks](https://arxiv.org/pdf/1909.12778.pdf) (https://github.com/DingXiaoH/GSM-SGD)
