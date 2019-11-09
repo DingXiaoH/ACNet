@@ -95,7 +95,7 @@ python acnet/acnet_wrnc16.py --try_arg=acnet_lrs6_warmup_bias
 2. Support more networks.
 3. Release a python module so that you can use Asymmetric Convolution Block just like the following example. Pull requests are welcomed.
 ```
-from acb import AsymConvBlock, acnet_fuse_and_load, acnet_switch_to_deploy
+from acnet import AsymConvBlock, acnet_fuse_and_load, acnet_switch_to_deploy
 
 # build model, replace regular Conv2d with AsymConvBlock
 class YourNet(nn.module):
