@@ -109,8 +109,8 @@ model.save_checkpoint(SAVE_PATH)	# use just the same PyTorch functions
 
 # deploy
 acnet_switch_to_deploy()
-deploy_model = YourNet(...)		# here deploy_model should be of the same structure as baseline
-acnet_fuse_and_load(SAVE_PATH)		# use the converted weights to initliaze it
+deploy_model = YourNet(...)			# here deploy_model should be of the same structure as baseline
+acnet_fuse_and_load(deploy_model, SAVE_PATH)	# use the converted weights to initliaze it
 test(model)
 ```
 
