@@ -79,7 +79,7 @@ Other models:
 
 VGG is deeper, so we train it for longer:
 ```
-python acnet/acnet_vgg.py --try_arg=acnet_lrs3_warmup_bias
+python acnet/acnet_vc.py --try_arg=acnet_lrs3_warmup_bias
 ```
 ResNet-56:
 ```
