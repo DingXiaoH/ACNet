@@ -4,7 +4,7 @@ News:
 1. ACNet has been used in real business products.
 2. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
 
-Update: the crop / pad settings have been updated (acnet/acnet_builder.py). Now ACB supports convolution operations that reduce the size of feature maps.
+Update: PaddlePaddle (https://github.com/paddlepaddle/paddle) implementation is in progress.
 
 This repository contains the codes for the following ICCV-2019 paper 
 
