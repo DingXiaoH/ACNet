@@ -60,10 +60,3 @@ def convert_acnet_weights(train_weights, deploy_weights, eps):
 
 
 
-
-
-if __name__ == '__main__':
-    convert_acnet_weights('acnet_exps/dc40_acnet_lrs2_bias_warmup_train/init.hdf5', None, eps=1e-5)
-
-
-
