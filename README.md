@@ -3,6 +3,7 @@
 News:
 1. ACNet has been used in real business products.
 2. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
+3. Deployed in more business products.
 
 Update: weights of ACNet on ImageNet will be released in several days.
 
