@@ -28,6 +28,10 @@ Some results (Top-1 accuracy) reproduced on CIFAR-10 using the codes in this rep
 | ResNet-56 	| 94.573      	|    	94.864 |
 | WRN-16-8 	| 95.582	|    	95.920 |
 
+If it does not work on your specific model and dataset, based on my experience, I would suggest you
+1. try different learning rate schedules
+2. initialize the trained scaling factor of batch norm (e.g., gamma variable in Tensorflow and bn.weight in PyTorch) in the three branches of every ACB as 1/3.
+
 The codes are based on PyTorch 1.1.
 
 The experiments reported in the paper were performed using Tensorflow. However, the backbone of the codes was refactored from the official Tensorflow benchmark (https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks), which was designed in the pursuit of extreme speed, not readability.
