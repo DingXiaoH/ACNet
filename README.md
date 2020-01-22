@@ -7,7 +7,7 @@ News:
 
 Update: weights of ACNet on ImageNet will be released in several days.
 
-Update: PaddlePaddle (https://github.com/paddlepaddle/paddle) implementation is in progress.
+Update: [PaddlePaddle](https://github.com/paddlepaddle/paddle) re-implementation for [building ACNet](https://github.com/PaddlePaddle/models/blob/develop/PaddleCV/image_classification/models/resnet_acnet.py) and [converting the weights] (https://github.com/PaddlePaddle/models/tree/develop/PaddleCV/image_classification/utils/acnet) has been accepted by PaddlePaddle official repo. An amazing work by @parap1uie-s!
 
 This repository contains the codes for the following ICCV-2019 paper 
 
