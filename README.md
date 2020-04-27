@@ -1,13 +1,13 @@
 # ACNet
 
+Other implementations:
+1. [PaddlePaddle](https://github.com/paddlepaddle/paddle) re-implementation for [building ACNet](https://github.com/PaddlePaddle/models/blob/develop/PaddleCV/image_classification/models/resnet_acnet.py) and [converting the weights](https://github.com/PaddlePaddle/models/tree/develop/PaddleCV/image_classification/utils/acnet) has been accepted by PaddlePaddle official repo. Amazing work by @parap1uie-s!
+2. Tensorflow2: an easy plugin module (https://github.com/CXYCarson/TF_AcBlock)! Just use it to build your model and call deploy() to convert it into the inference-time structure! Amazing work by @CXYCarson!
+
 News:
 1. ACNet has been used in real business products.
 2. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
 3. Deployed in more business products.
-
-Update: weights of ACNet on ImageNet will be released in several days.
-
-Update: [PaddlePaddle](https://github.com/paddlepaddle/paddle) re-implementation for [building ACNet](https://github.com/PaddlePaddle/models/blob/develop/PaddleCV/image_classification/models/resnet_acnet.py) and [converting the weights](https://github.com/PaddlePaddle/models/tree/develop/PaddleCV/image_classification/utils/acnet) has been accepted by PaddlePaddle official repo. Amazing work by @parap1uie-s!
 
 This repository contains the codes for the following ICCV-2019 paper 
 
