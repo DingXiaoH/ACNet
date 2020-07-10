@@ -1,5 +1,7 @@
 from builder import ConvBuilder
 import torch.nn as nn
+import torch.nn.init as init
+
 
 class CropLayer(nn.Module):
 
@@ -12,12 +14,20 @@ class CropLayer(nn.Module):
         assert self.cols_to_crop >= 0
 
     def forward(self, input):
-        return input[:, :, self.rows_to_crop:-self.rows_to_crop, self.cols_to_crop:-self.cols_to_crop]
+        if self.rows_to_crop == 0 and self.cols_to_crop == 0:
+            return input
+        elif self.rows_to_crop > 0 and self.cols_to_crop == 0:
+            return input[:, :, self.rows_to_crop:-self.rows_to_crop, :]
+        elif self.rows_to_crop == 0 and self.cols_to_crop > 0:
+            return input[:, :, :, self.cols_to_crop:-self.cols_to_crop]
+        else:
+            return input[:, :, self.rows_to_crop:-self.rows_to_crop, self.cols_to_crop:-self.cols_to_crop]
 
-
+        
 class ACBlock(nn.Module):
 
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, padding_mode='zeros', deploy=False):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, padding_mode='zeros', deploy=False,
+                 use_affine=True, reduce_gamma=False, use_last_bn=False, gamma_init=None):
         super(ACBlock, self).__init__()
         self.deploy = deploy
         if deploy:
@@ -28,7 +38,7 @@ class ACBlock(nn.Module):
                                          kernel_size=(kernel_size, kernel_size), stride=stride,
                                          padding=padding, dilation=dilation, groups=groups, bias=False,
                                          padding_mode=padding_mode)
-            self.square_bn = nn.BatchNorm2d(num_features=out_channels)
+            self.square_bn = nn.BatchNorm2d(num_features=out_channels, affine=use_affine)
 
             center_offset_from_origin_border = padding - kernel_size // 2
             ver_pad_or_crop = (center_offset_from_origin_border + 1, center_offset_from_origin_border)
@@ -52,8 +62,36 @@ class ACBlock(nn.Module):
                                       stride=stride,
                                       padding=hor_conv_padding, dilation=dilation, groups=groups, bias=False,
                                       padding_mode=padding_mode)
-            self.ver_bn = nn.BatchNorm2d(num_features=out_channels)
-            self.hor_bn = nn.BatchNorm2d(num_features=out_channels)
+            self.ver_bn = nn.BatchNorm2d(num_features=out_channels, affine=use_affine)
+            self.hor_bn = nn.BatchNorm2d(num_features=out_channels, affine=use_affine)
+
+            if reduce_gamma:
+                assert not use_last_bn
+                init.constant_(self.square_bn.weight, 1.0 / 3)
+                init.constant_(self.ver_bn.weight, 1.0 / 3)
+                init.constant_(self.hor_bn.weight, 1.0 / 3)
+
+            if use_last_bn:
+                assert not reduce_gamma
+                self.last_bn = nn.BatchNorm2d(num_features=out_channels, affine=True)
+
+            if gamma_init is not None:
+                assert not reduce_gamma
+                init.constant_(self.square_bn.weight, gamma_init)
+                init.constant_(self.ver_bn.weight, gamma_init)
+                init.constant_(self.hor_bn.weight, gamma_init)
+
+    def init_gamma(self, gamma_value):
+        init.constant_(self.square_bn.weight, gamma_value)
+        init.constant_(self.ver_bn.weight, gamma_value)
+        init.constant_(self.hor_bn.weight, gamma_value)
+        print('init gamma of square, ver and hor as ', gamma_value)
+
+    def single_init(self):
+        init.constant_(self.square_bn.weight, 1.0)
+        init.constant_(self.ver_bn.weight, 0.0)
+        init.constant_(self.hor_bn.weight, 0.0)
+        print('init gamma of square as 1, ver and hor as 0')
 
 
 
@@ -73,19 +111,23 @@ class ACBlock(nn.Module):
             horizontal_outputs = self.hor_conv(horizontal_outputs)
             horizontal_outputs = self.hor_bn(horizontal_outputs)
             # print(horizontal_outputs.size())
-            return square_outputs + vertical_outputs + horizontal_outputs
+            result = square_outputs + vertical_outputs + horizontal_outputs
+            if hasattr(self, 'last_bn'):
+                return self.last_bn(result)
+            return result
 
 
 
 class ACNetBuilder(ConvBuilder):
 
-    def __init__(self, base_config, deploy):
+    def __init__(self, base_config, deploy, gamma_init=None):
         super(ACNetBuilder, self).__init__(base_config=base_config)
         self.deploy = deploy
+        self.use_last_bn = False #TODO
+        self.gamma_init = gamma_init
 
     def switch_to_deploy(self):
         self.deploy = True
-
 
     def Conv2d(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', use_original_conv=False):
         if use_original_conv or kernel_size == 1 or kernel_size == (1, 1):
@@ -93,7 +135,8 @@ class ACNetBuilder(ConvBuilder):
                                  padding=padding, dilation=dilation, groups=groups, bias=bias, padding_mode=padding_mode, use_original_conv=True)
         else:
             return ACBlock(in_channels, out_channels, kernel_size=kernel_size, stride=stride,
-                       padding=padding, dilation=dilation, groups=groups, padding_mode=padding_mode, deploy=self.deploy)
+                       padding=padding, dilation=dilation, groups=groups, padding_mode=padding_mode, deploy=self.deploy,
+                           use_last_bn=self.use_last_bn, gamma_init=self.gamma_init)
 
 
     def Conv2dBN(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, padding_mode='zeros', use_original_conv=False):
@@ -102,7 +145,8 @@ class ACNetBuilder(ConvBuilder):
                                  padding=padding, dilation=dilation, groups=groups, padding_mode=padding_mode, use_original_conv=True)
         else:
             return ACBlock(in_channels, out_channels, kernel_size=kernel_size, stride=stride,
-                       padding=padding, dilation=dilation, groups=groups, padding_mode=padding_mode, deploy=self.deploy)
+                       padding=padding, dilation=dilation, groups=groups, padding_mode=padding_mode, deploy=self.deploy,
+                           use_last_bn=self.use_last_bn, gamma_init=self.gamma_init)
 
 
     def Conv2dBNReLU(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, padding_mode='zeros', use_original_conv=False):
@@ -112,7 +156,8 @@ class ACNetBuilder(ConvBuilder):
         else:
             se = nn.Sequential()
             se.add_module('acb', ACBlock(in_channels, out_channels, kernel_size=kernel_size, stride=stride,
-                       padding=padding, dilation=dilation, groups=groups, padding_mode=padding_mode, deploy=self.deploy))
+                       padding=padding, dilation=dilation, groups=groups, padding_mode=padding_mode, deploy=self.deploy,
+                                         use_last_bn=self.use_last_bn, gamma_init=self.gamma_init))
             se.add_module('relu', self.ReLU())
             return se
 
