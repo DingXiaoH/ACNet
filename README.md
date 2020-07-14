@@ -7,7 +7,7 @@ News:
 4. ACNet has been used in several real business products.
 5. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
 
-Update: Fixed a bug in CropLayer, and changed the behavior of ACB when kernel_size > 3. For a K > 3 layer, ACB used to still add 1x3 and 3x1 onto KxK, but now it will use 1xK and Kx1. I got better results on AlexNet. I will update the whole repo in half a month, including ImageNet training, testing, and trained weights.
+Update: Fixed a bug in CropLayer. I will update the whole repo in half a month, including ImageNet training, testing, and trained weights.
 
 ICCV 2019 paper: [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf).
 
