@@ -57,7 +57,7 @@ Citation:
 
 As designing appropriate Convolutional Neural Network (CNN) architecture in the context of a given application usually involves heavy human works or numerous GPU hours, the research community is soliciting the architecture-neutral CNN structures, which can be easily plugged into multiple mature architectures to improve the performance on our real-world applications. We propose Asymmetric Convolution Block (ACB), an architecture-neutral structure as a CNN building block, which uses 1D asymmetric convolutions to strengthen the square convolution kernels. For an off-the-shelf architecture, we replace the standard square-kernel convolutional layers with ACBs to construct an Asymmetric Convolutional Network (ACNet), which can be trained to reach a higher level of accuracy. After training, we equivalently convert the ACNet into the same original architecture, thus requiring no extra computations anymore. We have observed that ACNet can improve the performance of various models on CIFAR and ImageNet by a clear margin. Through further experiments, we attribute the effectiveness of ACB to its capability of enhancing the model's robustness to rotational distortions and strengthening the central skeleton parts of square convolution kernels.
 
-## Example Usage: ResNet-18 on ImageNet with multiple GPUs
+## Example Usage: ResNet-18/34/50 on ImageNet with multiple GPUs
 
 1. Enter this directory.
 
@@ -86,6 +86,9 @@ python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres1
 ```
 python3 display_hdf5.py acnet_exps/sres18_acb_train/finish_deploy.hdf5
 ```
+
+6. ResNet-34 and ResNet-50 are also provided in acnet/do_acnet.py, please try as you wish.
+
 
 ## Example Usage: Cifar-quick, VGG, ResNet-56, WRN-16-8 on CIFAR-10 with 1 GPU
 
