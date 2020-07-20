@@ -102,28 +102,28 @@ export PYTHONPATH=.
 export CUDA_VISIBLE_DEVICES=0
 ```
 
-4. Train the Cifar-quick baseline and ACNet. The code will automatically convert the trained weights to the original structure (acnet_exps/XXX_acb_train/finish_deploy.hdf5) and test.
+4. Train the Cifar-quick ACNet. The code will automatically convert the trained weights to the original structure (acnet_exps/cfqkbnc_acb_train/finish_deploy.hdf5) and test. Then train a regular model as baseline for the comparison.
 ```
-python acnet/do_acnet.py -a wrnc16plain -b base
-python acnet/do_acnet.py -a wrnc16plain -b acb
+python acnet/do_acnet.py -a cfqkbnc -b acb
+python acnet/do_acnet.py -a cfqkbnc -b base
 ```
 
-5. Train the VGG baseline and ACNet.
+5. Do the same on VGG.
 ```
-python acnet/do_acnet.py -a vc -b base
 python acnet/do_acnet.py -a vc -b acb
+python acnet/do_acnet.py -a vc -b base
 ```
 
-6. Train the ResNet-56 baseline and ACNet.
+6. Do the same on ResNet-56.
 ```
-python acnet/do_acnet.py -a src56 -b base
 python acnet/do_acnet.py -a src56 -b acb
+python acnet/do_acnet.py -a src56 -b base
 ```
 
-7. Train the WRN-16-8 baseline and ACNet.
+7. Do the same on WRN-16-8.
 ```
-python acnet/do_acnet.py -a wrnc16plain -b base
 python acnet/do_acnet.py -a wrnc16plain -b acb
+python acnet/do_acnet.py -a wrnc16plain -b base
 ```
 
 8. Show the accuracy of all the models.
