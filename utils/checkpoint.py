@@ -1,7 +1,16 @@
 import torch
 import time
 from collections import OrderedDict
+import os
 
+def get_last_checkpoint(dir):
+    'iter-200000.pth'
+    target_ckpts = [t for t in os.listdir(dir) if '.pth' in t]
+    if 'latest.pth' in target_ckpts:
+        return os.path.join(dir, 'latest.pth')
+    target_ckpts.sort(key=lambda x: int(x.replace('iter-', '').replace('.pth', '')))
+    ckpt = os.path.join(dir, target_ckpts[-1])
+    return ckpt
 
 def load_model(model, model_file, logger):
     t_start = time.time()
@@ -28,20 +37,21 @@ def load_model(model, model_file, logger):
     missing_keys = own_keys - ckpt_keys
     unexpected_keys = ckpt_keys - own_keys
 
-    if len(missing_keys) > 0:
+    if len(missing_keys) > 0 and logger is not None:
         logger.warning('Missing key(s) in state_dict: {}'.format(
             ', '.join('{}'.format(k) for k in missing_keys)))
 
-    if len(unexpected_keys) > 0:
+    if len(unexpected_keys) > 0 and logger is not None:
         logger.warning('Unexpected key(s) in state_dict: {}'.format(
             ', '.join('{}'.format(k) for k in unexpected_keys)))
 
     del state_dict
     t_end = time.time()
-    logger.info(
-        "Load model, Time usage:\n\tIO: {}, "
-        "initialize parameters: {}".format(
-            t_io_end - t_start, t_end - t_io_end))
+    if logger is not None:
+        logger.info(
+            "Load model, Time usage:\n\tIO: {}, "
+            "initialize parameters: {}".format(
+                t_io_end - t_start, t_end - t_io_end))
 
     return model
 

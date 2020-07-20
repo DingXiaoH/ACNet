@@ -1,6 +1,5 @@
 import torch.nn as nn
 from builder import ConvBuilder
-from constants import wrn_convert_flattened_deps
 
 class WRNCifarBlock(nn.Module):
 
@@ -32,10 +31,11 @@ class WRNCifarBlock(nn.Module):
 
 class WRNCifarNet(nn.Module):
 
-    def __init__(self, block_counts, num_classes, builder:ConvBuilder, deps, use_dropout):
+    def __init__(self, block_counts, num_classes, builder:ConvBuilder, use_dropout):
         super(WRNCifarNet, self).__init__()
         self.bd = builder
-        converted_deps = wrn_convert_flattened_deps(deps)
+        assert block_counts == (2,2,2)
+        converted_deps = [16, [[128, 128], [128, 128]], [[256, 256], [256, 256]], [[512, 512], [512, 512]]]
         print('the converted deps is ', converted_deps)
 
         self.conv1 = builder.Conv2d(in_channels=3, out_channels=converted_deps[0], kernel_size=3, stride=1, padding=1, bias=False)
@@ -79,27 +79,6 @@ class WRNCifarNet(nn.Module):
 
 
 def create_wrnc16plain(cfg, builder):
-    return WRNCifarNet(block_counts=(2,2,2), num_classes=10, builder=builder, deps=cfg.deps, use_dropout=False)
+    return WRNCifarNet(block_counts=(2,2,2), num_classes=10, builder=builder, use_dropout=False)
 def create_wrnc16drop(cfg, builder):
-    return WRNCifarNet(block_counts=(2,2,2), num_classes=10, builder=builder, deps=cfg.deps, use_dropout=True)
-def create_wrnc28plain(cfg, builder):
-    return WRNCifarNet(block_counts=(4,4,4), num_classes=10, builder=builder, deps=cfg.deps, use_dropout=False)
-def create_wrnc28drop(cfg, builder):
-    return WRNCifarNet(block_counts=(4,4,4), num_classes=10, builder=builder, deps=cfg.deps, use_dropout=True)
-def create_wrnc40plain(cfg, builder):
-    return WRNCifarNet(block_counts=(6,6,6), num_classes=10, builder=builder, deps=cfg.deps, use_dropout=False)
-def create_wrnc40drop(cfg, builder):
-    return WRNCifarNet(block_counts=(6,6,6), num_classes=10, builder=builder, deps=cfg.deps, use_dropout=True)
-
-def create_wrnh16plain(cfg, builder):
-    return WRNCifarNet(block_counts=(2,2,2), num_classes=100, builder=builder, deps=cfg.deps, use_dropout=False)
-def create_wrnh16drop(cfg, builder):
-    return WRNCifarNet(block_counts=(2,2,2), num_classes=100, builder=builder, deps=cfg.deps, use_dropout=True)
-def create_wrnh28plain(cfg, builder):
-    return WRNCifarNet(block_counts=(4,4,4), num_classes=100, builder=builder, deps=cfg.deps, use_dropout=False)
-def create_wrnh28drop(cfg, builder):
-    return WRNCifarNet(block_counts=(4,4,4), num_classes=100, builder=builder, deps=cfg.deps, use_dropout=True)
-def create_wrnh40plain(cfg, builder):
-    return WRNCifarNet(block_counts=(6,6,6), num_classes=100, builder=builder, deps=cfg.deps, use_dropout=False)
-def create_wrnh40drop(cfg, builder):
-    return WRNCifarNet(block_counts=(6,6,6), num_classes=100, builder=builder, deps=cfg.deps, use_dropout=True)
+    return WRNCifarNet(block_counts=(2,2,2), num_classes=10, builder=builder, use_dropout=True)

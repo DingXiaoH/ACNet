@@ -18,11 +18,14 @@ var_cnt = 0
 for name, array in di.items():
     if array.ndim in [2, 4]:
         num_kernel_params += array.size
-    print(name, array.shape, np.mean(array), np.std(array), ' positive {}, negative {}, zeros {}'.format(np.sum(array > 0), np.sum(array < 0), np.sum(array == 0)))
-    if 'res' in name:
-        print(array[:4, :4])
-    elif 'diag' in name:
-        print(array)
+
+    if 'base_mask' in name:
+        print(name, array)
+
+    print(name, array.shape, np.mean(array), np.std(array),
+          ' positive {}, negative {}, zeros {}, near-zero {}'.format(np.sum(array > 0), np.sum(array < 0), np.sum(array == 0),
+                                                                     np.sum(np.abs(array) <= 1e-5)))
+
     if array.ndim == 2:
         matrix_param_cnt += array.size
     elif array.ndim == 1:
@@ -39,10 +42,10 @@ for name, array in di.items():
         beta_cnt += array.size
     elif 'bias' in name:
         bias_cnt += array.size
+    elif 'spatial_mask' in name:
+        print(array)
+        print(np.sum(array))
 
-    # if 'resmat' in name:
-    #     print(np.transpose(array).dot(array))
-    #     exit()
 print('number of kernel params: ', num_kernel_params)
 print('vec {}, matrix {}, conv {}, total {}'.format(vec_param_cnt, matrix_param_cnt, conv_kernel_cnt,
                                                     vec_param_cnt + matrix_param_cnt + conv_kernel_cnt))

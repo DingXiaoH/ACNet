@@ -56,7 +56,3 @@ def convert_acnet_weights(train_weights, deploy_weights, eps):
         if 'hor_' not in k and 'ver_' not in k and 'square_' not in k:
             deploy_dict[k] = v
     save_hdf5(deploy_dict, deploy_weights)
-
-
-
-

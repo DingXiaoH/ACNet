@@ -8,6 +8,82 @@ import h5py
 import numpy as np
 import time
 
+def init_as_tensorflow(model):
+    for k, v in model.named_parameters():
+        if v.dim() in [2, 4]:
+            torch.nn.init.xavier_uniform_(v)
+            print('init {} as xavier_uniform'.format(k))
+        if 'bias' in k and 'bn' not in k.lower():
+            torch.nn.init.zeros_(v)
+            print('init {} as zero'.format(k))
+
+
+def normalize(tensor, mean, std, inplace=False):
+    """Normalize a tensor image with mean and standard deviation.
+
+    .. note::
+        This transform acts out of place by default, i.e., it does not mutates the input tensor.
+
+    See :class:`~torchvision.transforms.Normalize` for more details.
+
+    Args:
+        tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
+        mean (sequence): Sequence of means for each channel.
+        std (sequence): Sequence of standard deviations for each channel.
+        inplace(bool,optional): Bool to make this operation inplace.
+
+    Returns:
+        Tensor: Normalized Tensor image.
+    """
+    if not inplace:
+        tensor = tensor.clone()
+
+    dtype = tensor.dtype
+    mean = torch.as_tensor(mean, dtype=dtype, device=tensor.device)
+    std = torch.as_tensor(std, dtype=dtype, device=tensor.device)
+    tensor.sub_(mean[:, None, None]).div_(std[:, None, None])
+    return tensor
+
+def torchvision_style_normalize(input):
+    input_arr = input.cpu().numpy()
+    mean = [0.485, 0.456, 0.406]
+    std = [0.229, 0.224, 0.225]
+    for kk in range(input_arr.shape[0]):
+        im = input_arr[kk, :, :, :]
+        im = im[::-1, :, :]
+        im /= 255.
+        im = im.transpose((1, 2, 0))
+        im -= mean
+        im /= std
+        im = im.transpose((2, 0, 1))
+        input_arr[kk, :, :, :] = im
+    input_tensor = torch.from_numpy(input_arr).type(input.dtype).to(input.device)
+    return input_tensor
+
+torchvision_mean = np.array([0.485, 0.456, 0.406]).reshape((1, 3, 1, 1))
+torchvision_std = np.array([0.229, 0.224, 0.225]).reshape((1, 3, 1, 1))
+
+def efficient_torchvision_style_normalize(input):
+    input_arr = input.cpu().numpy()
+    input_arr /= 255.
+
+    input_arr = np.array(input_arr[:, ::-1, :, :])
+    # input_arr = input_arr.transpose((0, 2, 3, 1))
+    input_arr -= torchvision_mean
+    input_arr /= torchvision_std
+
+    # for kk in range(input_arr.shape[0]):
+    #     im = input_arr[kk, :, :, :]
+    #     im = im[::-1, :, :]
+    #     im = im.transpose((1, 2, 0))    # from CHW to HWC
+    #     im -= mean
+    #     im /= std
+    #     im = im.transpose((2, 0, 1))    # from HWC to CHW
+    #     input_arr[kk, :, :, :] = im
+    input_tensor = torch.from_numpy(input_arr).type(input.dtype).to(input.device)
+    return input_tensor
+
+
 def cur_time():
     return time.strftime('%Y,%b,%d,%X')
 
@@ -16,7 +92,12 @@ def log_important(message, log_file):
     with open(log_file, 'a') as f:
         print(message, cur_time(), file=f)
 
-
+def extract_deps_from_weights_file(file_path):
+    weight_dic = read_hdf5(file_path)
+    if 'deps' in weight_dic:
+        return weight_dic['deps']
+    else:
+        return None
 
 def representsInt(s):
     try:
@@ -56,6 +137,49 @@ def start_exp():
     print('we have {} torch devices'.format(torch.cuda.device_count()),
           'the allocated GPU memory is {}'.format(torch.cuda.memory_allocated()))
     return try_arg
+
+
+def start_exp_argv():
+    import sys
+    try_arg = sys.argv[1]
+    assert '--try' not in try_arg
+    print('the try_arg is ', try_arg)
+    print('we have {} torch devices'.format(torch.cuda.device_count()),
+          'the allocated GPU memory is {}'.format(torch.cuda.memory_allocated()))
+    return try_arg
+
+def start_exp_model_and_argv():
+    import sys
+    model_name = sys.argv[1]
+    try_arg = sys.argv[2]
+    assert '--try' not in try_arg
+    print('the try_arg is ', try_arg)
+    print('we have {} torch devices'.format(torch.cuda.device_count()),
+          'the allocated GPU memory is {}'.format(torch.cuda.memory_allocated()))
+    if len(sys.argv) >= 4:
+        assert len(sys.argv) == 4
+        assert sys.argv[3] == 'continue'
+        auto_continue = True
+    else:
+        auto_continue = False
+    return model_name, try_arg, auto_continue
+
+
+def start_exp_model_and_argv_with_local_rank():
+    import sys
+    model_name = sys.argv[2]
+    try_arg = sys.argv[3]
+    assert '--try' not in try_arg
+    print('the try_arg is ', try_arg)
+    print('we have {} torch devices'.format(torch.cuda.device_count()),
+          'the allocated GPU memory is {}'.format(torch.cuda.memory_allocated()))
+    if len(sys.argv) >= 5:
+        assert len(sys.argv) == 5
+        assert sys.argv[4] == 'continue'
+        auto_continue = True
+    else:
+        auto_continue = False
+    return model_name, try_arg, auto_continue
 
 
 def torch_accuracy(output, target, topk=(1,)) -> List[torch.Tensor]:
