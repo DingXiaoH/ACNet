@@ -7,7 +7,7 @@ News:
 4. ACNet has been used in several real business products.
 5. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
 
-Update: Updated the whole repo, including **ImageNet** training (with Distributed Data Parallel). The default learning rate schedules were changed to cosine annealing, which yield higher accuracy on ImageNet. Changed the behavior of ACB when k > 3. It used to add 1x3 and 3x1 kernels onto 5x5, but now it uses 1x5 and 5x1.
+Update: Updated the whole repo, including **ImageNet** training (with Distributed Data Parallel). The default learning rate schedules were changed to cosine annealing, which performed better on ImageNet. Changed the behavior of ACB when k > 3. It used to add 1x3 and 3x1 kernels onto 5x5, but now it uses 1x5 and 5x1.
 
 ICCV 2019 paper: [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf).
 
@@ -38,8 +38,6 @@ Some results (Top-1 accuracy) reproduced on CIFAR-10 using the codes in this rep
 If it does not work on your specific model and dataset, based on my experience, I would suggest you
 1. try different learning rate schedules
 2. initialize the trained scaling factor of batch norm (e.g., gamma variable in Tensorflow and bn.weight in PyTorch) in the three branches of every ACB as 1/3. This improves the performance on CIFAR
-
-The codes are based on PyTorch 1.1.
 
 The experiments reported in the paper were performed using Tensorflow. However, the backbone of the codes was refactored from the official Tensorflow benchmark (https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks), which was designed in the pursuit of extreme speed, not readability.
 
@@ -72,22 +70,26 @@ export PYTHONPATH=.
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 ```
 
-3. Train a regular ResNet-18 on ImageNet as baseline. The top-1 accuracy will be around 70.6%.
-```
-python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres18 -b base
-```
-
-4. Train a ResNet-18 on ImageNet with Asymmetric Convolution Blocks. The code will automatically convert the trained weights to the original structure and test.
+3. Train a ResNet-18 on ImageNet with Asymmetric Convolution Blocks. The code will automatically convert the trained weights to the original structure and test. The top-1 accuracy will be around 71.2%.
 ```
 python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres18 -b acb
 ```
 
-5. Check the shape of weights in the converted model.
+4. Check the shape of weights in the converted model.
 ```
 python3 display_hdf5.py acnet_exps/sres18_acb_train/finish_deploy.hdf5
 ```
 
+5. Train a regular ResNet-18 on ImageNet as baseline for the comparison. The top-1 accuracy will be around 70.6%.
+```
+python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres18 -b base
+```
+
 6. ResNet-34 and ResNet-50 are also provided in acnet/do_acnet.py, please try as you wish.
+```
+python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres34 -b acb
+python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres50 -b acb
+```
 
 
 ## Example Usage: Cifar-quick, VGG, ResNet-56, WRN-16-8 on CIFAR-10 with 1 GPU
