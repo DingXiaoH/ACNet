@@ -57,14 +57,14 @@ if __name__ == '__main__':
     elif network_type == 'cfqkbnc':
         weight_decay_strength = 1e-4
         #   ------------------------------------
-        #   94.47  --->  95+
+        #   86.2  --->  86.8+
         batch_size = 128
         lrs = LRSchedule(base_lr=0.1, max_epochs=150, lr_epoch_boundaries=None, lr_decay_factor=None,
                          linear_final_lr=None, cosine_minimum=0)
         warmup_epochs = 0
         gamma_init = 0.333
         #   ------------------------------------
-        #   86.2  --->  86.8+
+
 
     elif network_type == 'src56':
         weight_decay_strength = 1e-4
