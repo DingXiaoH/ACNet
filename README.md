@@ -72,12 +72,12 @@ export PYTHONPATH=.
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 ```
 
-3. Train a regular ResNet-18 on ImageNet as baseline.
+3. Train a regular ResNet-18 on ImageNet as baseline. The top-1 accuracy will be around 70.6%.
 ```
 python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres18 -b base
 ```
 
-4. Train a ResNet-18 on ImageNet with Asymmetric Convolution Blocks. The code will automatically convert the trained weights to the original structure and test it.
+4. Train a ResNet-18 on ImageNet with Asymmetric Convolution Blocks. The code will automatically convert the trained weights to the original structure and test.
 ```
 python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres18 -b acb
 ```
@@ -102,7 +102,7 @@ export PYTHONPATH=.
 export CUDA_VISIBLE_DEVICES=0
 ```
 
-4. Train the Cifar-quick baseline and ACNet.
+4. Train the Cifar-quick baseline and ACNet. The code will automatically convert the trained weights to the original structure (acnet_exps/XXX_acb_train/finish_deploy.hdf5) and test.
 ```
 python acnet/do_acnet.py -a wrnc16plain -b base
 python acnet/do_acnet.py -a wrnc16plain -b acb
