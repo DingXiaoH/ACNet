@@ -7,7 +7,7 @@ News:
 4. ACNet has been used in several real business products.
 5. At ICCV 2019, I was told that ACNet improved the performance of some semantic segmentation tasks by 2%. So glad to hear that!
 
-Update: Updated the whole repo, including ImageNet training (with Distributed Data Parallel). Instructions will be updated in one day.
+Update: Updated the whole repo, including **ImageNet** training (with Distributed Data Parallel). The default learning rate schedules were changed to cosine annealing, which yield higher accuracy on ImageNet. Changed the behavior of ACB when k > 3. It used to add 1x3 and 3x1 kernels onto 5x5, but now it uses 1x5 and 5x1.
 
 ICCV 2019 paper: [ACNet: Strengthening the Kernel Skeletons for Powerful CNN via Asymmetric Convolution Blocks](http://openaccess.thecvf.com/content_ICCV_2019/papers/Ding_ACNet_Strengthening_the_Kernel_Skeletons_for_Powerful_CNN_via_Asymmetric_ICCV_2019_paper.pdf).
 
@@ -21,18 +21,23 @@ This demo will show you how to
 3. Test the ACNet and the baseline, get the average accuracy.
 4. Convert the ACNet into exactly the same structure as the regular counterpart for deployment. Congratulations! The users of your model will be happy because they can enjoy higher accuracy with exactly the same computational burdens as the baseline trained with regular conv layers.
 
+About the environment:
+1. We used torch==1.3.0, torchvision==0.4.1, CUDA==10.2, NVIDIA driver version==440.82, tensorboard==1.11.0 on a machine with eight 2080Ti GPUs. 
+2. Our method does not rely on any new or deprecated features of any libraries, so there is no need to make an identical environment.
+3. If you get any errors regarding tensorboard or tensorflow, you may simply delete the code related to tensorboard or SummaryWriter.
+
 Some results (Top-1 accuracy) reproduced on CIFAR-10 using the codes in this repository (note that we add batch norm for Cifar-quick and VGG baselines):
 
 | Model        | Baseline           | ACNet  |
 | ------------- |:-------------:| -----:|
-| Cifar-quick   | 86.249 	|  	87.102 |
-| VGG      	| 94.250      	|   	94.862 |
-| ResNet-56 	| 94.573      	|    	94.864 |
-| WRN-16-8 	| 95.582	|    	95.920 |
+| Cifar-quick   | 86.20 	|  	86.87 |
+| VGG      	| 93.99      	|   	94.54 |
+| ResNet-56 	| 94.55      	|    	95.06 |
+| WRN-16-8 	| 95.89		|    	96.33 |
 
 If it does not work on your specific model and dataset, based on my experience, I would suggest you
 1. try different learning rate schedules
-2. initialize the trained scaling factor of batch norm (e.g., gamma variable in Tensorflow and bn.weight in PyTorch) in the three branches of every ACB as 1/3.
+2. initialize the trained scaling factor of batch norm (e.g., gamma variable in Tensorflow and bn.weight in PyTorch) in the three branches of every ACB as 1/3. This improves the performance on CIFAR
 
 The codes are based on PyTorch 1.1.
 
@@ -52,53 +57,78 @@ Citation:
 
 As designing appropriate Convolutional Neural Network (CNN) architecture in the context of a given application usually involves heavy human works or numerous GPU hours, the research community is soliciting the architecture-neutral CNN structures, which can be easily plugged into multiple mature architectures to improve the performance on our real-world applications. We propose Asymmetric Convolution Block (ACB), an architecture-neutral structure as a CNN building block, which uses 1D asymmetric convolutions to strengthen the square convolution kernels. For an off-the-shelf architecture, we replace the standard square-kernel convolutional layers with ACBs to construct an Asymmetric Convolutional Network (ACNet), which can be trained to reach a higher level of accuracy. After training, we equivalently convert the ACNet into the same original architecture, thus requiring no extra computations anymore. We have observed that ACNet can improve the performance of various models on CIFAR and ImageNet by a clear margin. Through further experiments, we attribute the effectiveness of ACB to its capability of enhancing the model's robustness to rotational distortions and strengthening the central skeleton parts of square convolution kernels.
 
-## Example Usage
+## Example Usage: ResNet-18 on ImageNet with multiple GPUs
 
-1. Install PyTorch 1.1. Clone this repo and enter the directory. Modify PYTHONPATH or you will get an ImportError.
-```
-export PYTHONPATH='WHERE_YOU_CLONED_THIS_REPO'
-```
+1. Enter this directory.
 
-2. Modify 'CIFAR10_PATH' in dataset.py to the directory of your CIFAR-10 dataset. If the dataset is not found in that directory, it will be automatically downloaded. 
-
-3. Train a Cifar-quick on CIFAR-10 without Asymmetric Convolution Blocks as baseline. (We use learning rate warmup and weight decay on bias parameters. They are not necessities but just preferences. Here 'lrs5' is a pre-defined learning rate schedule.) The model will be evaluated every two epochs.
+2. Make a soft link to your ImageNet directory, which contains "train" and "val" directories.
 ```
-python acnet/acnet_cfqkbnc.py --try_arg=normal_lrs5_warmup_bias
+ln -s YOUR_PATH_TO_IMAGENET imagenet_data
 ```
 
-4. Train a Cifar-quick on CIFAR-10 with Asymmetric Convolution Blocks. The trained weights will be saved to acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish.hdf5. Note that Cifar-quick uses 5x5 convs, and we add 1x3 and 3x1 onto 5x5 kernels. Of course, 1x5 and 5x1 convs may work better.
+3. Set the environment variables. We use 8 GPUs with Distributed Data Parallel. Of course, 4 GPUs work as well.
 ```
-python acnet/acnet_cfqkbnc.py --try_arg=acnet_lrs5_warmup_bias
-```
-
-4. Check the average accuracy of the two models in their last ten evaluations. You will see the gap.
-```
-python show_log.py
+export PYTHONPATH=.
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 ```
 
-5. Build a Cifar-quick with the same structure as the baseline model, then convert the weights of the ACNet counterpart via BN fusion and branch fusion to initialize it. Test before and after the conversion. You will see identical results.
+3. Train a regular ResNet-18 on ImageNet as baseline.
 ```
-python acnet/acnet_test.py cfqkbnc acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish.hdf5
-```
-
-6. Check the name and shape of the converted weights.
-```
-python display_hdf5.py acnet_exps/cfqkbnc_acnet_lrs5_warmup_bias_train/finish_deploy.hdf5
+python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres18 -b base
 ```
 
-Other models:
+4. Train a ResNet-18 on ImageNet with Asymmetric Convolution Blocks. The code will automatically convert the trained weights to the original structure and test it.
+```
+python -m torch.distributed.launch --nproc_per_node=8 acnet/do_acnet.py -a sres18 -b acb
+```
 
-VGG is deeper, so we train it for longer:
+5. Check the shape of weights in the converted model.
 ```
-python acnet/acnet_vc.py --try_arg=acnet_lrs3_warmup_bias
+python3 display_hdf5.py acnet_exps/sres18_acb_train/finish_deploy.hdf5
 ```
-ResNet-56:
+
+## Example Usage: Cifar-quick, VGG, ResNet-56, WRN-16-8 on CIFAR-10 with 1 GPU
+
+1. Enter this directory.
+
+2. Make a soft link to your CIFAR-10 directory. If the dataset is not found in the directory, it will be automatically downloaded.
 ```
-python acnet/acnet_rc56.py --try_arg=acnet_lrs3_warmup_bias
+ln -s YOUR_PATH_TO_CIFAR cifar10_data
 ```
-WRN-16-8, we slightly lengthen the learning rate schedule recommended in the WRN paper:
+
+3. Set the environment variables.
 ```
-python acnet/acnet_wrnc16.py --try_arg=acnet_lrs6_warmup_bias
+export PYTHONPATH=.
+export CUDA_VISIBLE_DEVICES=0
+```
+
+4. Train the Cifar-quick baseline and ACNet.
+```
+python acnet/do_acnet.py -a wrnc16plain -b base
+python acnet/do_acnet.py -a wrnc16plain -b acb
+```
+
+5. Train the VGG baseline and ACNet.
+```
+python acnet/do_acnet.py -a vc -b base
+python acnet/do_acnet.py -a vc -b acb
+```
+
+6. Train the ResNet-56 baseline and ACNet.
+```
+python acnet/do_acnet.py -a src56 -b base
+python acnet/do_acnet.py -a src56 -b acb
+```
+
+7. Train the WRN-16-8 baseline and ACNet.
+```
+python acnet/do_acnet.py -a wrnc16plain -b base
+python acnet/do_acnet.py -a wrnc16plain -b acb
+```
+
+8. Show the accuracy of all the models.
+```
+python show_log.py acnet_exps
 ```
 
 ## TODOs. 
