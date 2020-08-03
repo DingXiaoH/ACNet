@@ -126,7 +126,7 @@ if __name__ == '__main__':
         train_main(local_rank=start_arg.local_rank, cfg=config, convbuilder=builder,
                show_variables=True, auto_continue=auto_continue)
 
-    if block_type == 'acb':
+    if block_type == 'acb' and start_arg.local_rank == 0:
         convert_acnet_weights(target_weights, target_weights.replace('.hdf5', '_deploy.hdf5'), eps=1e-5)
         deploy_builder = ACNetBuilder(base_config=config, deploy=True)
         general_test(network_type=network_type, weights=target_weights.replace('.hdf5', '_deploy.hdf5'),
