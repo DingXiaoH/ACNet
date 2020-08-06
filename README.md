@@ -1,4 +1,4 @@
-# ACNet
+# ACNet (ICCV-2019)
 
 News:
 1. Zhang et al. used our ACB in their model [ACFD](https://arxiv.org/abs/2007.00899), which won the **1st place** in IJCAI 2020 iCartoon Face Challenge (Detection Track). Congratulations!
