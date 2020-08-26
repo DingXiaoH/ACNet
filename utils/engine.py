@@ -70,7 +70,7 @@ class Engine(object):
             self.devices = [i for i in range(self.world_size)]
         else:
             self.world_size = 1
-            self.world_rank = 1
+            self.world_rank = 0
             # self.devices = parse_torch_devices(self.args.devices)TODO
             self.devices = [0]
 
