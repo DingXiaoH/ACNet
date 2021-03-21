@@ -2,7 +2,7 @@
 ACNet V2 will be released in about a month. Higher performance and still no inference-time costs. Will update this whole repo.
 
 News:
-1. Zhang et al. used our ACB in their model [ACFD](https://arxiv.org/abs/2007.00899), which won the **1st place** in IJCAI 2020 iCartoon Face Challenge (Detection Track). Congratulations!
+1.Zhang et al. used our ACB in their model [ACFD](https://arxiv.org/abs/2007.00899), which won the **1st place** in IJCAI 2020 iCartoon Face Challenge (Detection Track). Congratulations!
 2. Liu et al. extended ACB to EACB (Enhanced Asym Conv Block) in their [MMDM](https://openaccess.thecvf.com/content_CVPRW_2020/html/w31/Liu_MMDM_Multi-Frame_and_Multi-Scale_for_Image_Demoireing_CVPRW_2020_paper.html), which helped them won the **3rd place** in NTIRE 2020 Challenge on Image Demoireing at CVPR 2020. Congratulations!
 3. MMDM also won the **4th place** in NTIRE 2020 Challenge on Real Image Denoising at CVPR 2020. Congratulations again!
 4. ACNet has been used in several real business products.
