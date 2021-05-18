@@ -1,5 +1,10 @@
 # ACNet (ICCV-2019)
-ACNet V2 will be released in about a month. Higher performance and still no inference-time costs. Will update this whole repo.
+
+ACNet v2 (Diverse Branch Block, DBB): [Diverse Branch Block: Building a Convolution as an Inception-like Unit](https://arxiv.org/abs/2103.13425).
+
+DBB (CVPR 2021) is a CNN component with higher performance than ACB and still no inference-time costs. Sometimes I call it ACNet v2 because "DBB" is 2 bits larger than "ACB" in ASCII (lol).
+
+I would suggest you check the repo of DBB (https://github.com/DingXiaoH/DiverseBranchBlock). It also has an implementation of ACNet.
 
 News:
 1. Zhang et al. used our ACB in their model [ACFD](https://arxiv.org/abs/2007.00899), which won the **1st place** in IJCAI 2020 iCartoon Face Challenge (Detection Track). Congratulations!
