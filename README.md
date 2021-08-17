@@ -153,29 +153,6 @@ python acnet/do_acnet.py -a wrnc16plain -b base
 python show_log.py acnet_exps
 ```
 
-## TODOs. 
-1. Support more networks.
-2. Release a PyTorch module so that you can use Asymmetric Convolution Block just like the following example. Pull requests are welcomed.
-```
-from acnet import AsymConvBlock, acnet_fuse_and_load, acnet_switch_to_deploy
-
-# build model, replace regular Conv2d with AsymConvBlock
-class YourNet(nn.module):
-    ...
-    self.conv1 = AsymConvBlock(in_channels=..., out_channels=..., ...)
-    self.conv2 = AsymConvBlock(in_channels=..., out_channels=..., ...)
-
-# train
-model = YourNet(...)
-train(model)
-model.save_checkpoint(SAVE_PATH)	# use just the same PyTorch functions
-
-# deploy
-acnet_switch_to_deploy()
-deploy_model = YourNet(...)			# here deploy_model should be of the same structure as baseline
-acnet_fuse_and_load(deploy_model, SAVE_PATH)	# use the converted weights to initliaze it
-test(model)
-```
 
 
 ## Contact
