@@ -1,5 +1,16 @@
 # ACNet (ICCV-2019)
 
+Update (Aug 17, 2021): refactored the code of ACB. The readability has been greatly improved. You may call **switch_to_deploy** of an ACB to convert it to the inference-time structure. If you use ACB in your own model, the conversion is as easy as
+```
+for m in your_model.modules():
+    if hasattr(m, 'switch_to_deploy'):
+        m.switch_to_deploy()
+```
+There is also some runnable code for testing the equivalence in the main function of acnet/acb.py. Just check it by
+```
+python acnet/acb.py
+```
+
 ACNet v2 (Diverse Branch Block, DBB): [Diverse Branch Block: Building a Convolution as an Inception-like Unit](https://arxiv.org/abs/2103.13425).
 
 DBB (CVPR 2021) is a CNN component with higher performance than ACB and still no inference-time costs. Sometimes I call it ACNet v2 because "DBB" is 2 bits larger than "ACB" in ASCII (lol).
